@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
-import { Container } from './components/Container';
+import './index.css';
+import Loader from 'react-loader-spinner';
+// import { Container } from './components/Container';
+import Searchbar from './components/Searchbar';
 
-class Feeedback extends Component {
+class App extends Component {
   render() {
-    return <Container>null</Container>;
+    return (
+      <div>
+        <Searchbar />
+        <Loader type="Puff" color="#00BFFF" height={100} width={100} timeout={3000} />
+      </div>
+    );
   }
 }
 
-export default Feeedback;
+export default App;
