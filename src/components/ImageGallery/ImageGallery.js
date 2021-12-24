@@ -2,9 +2,11 @@ import React from 'react';
 import s from './ImageGallery.module.css';
 import ImageGalleryItem from '../ImageGalleryItem/';
 
-const ImageGallery = ({ children }) => (
+const ImageGallery = ({ images }) => (
   <ul className={s.ImageGallery}>
-    <ImageGalleryItem />
+    {images.map(({ id, webformatURL }) => (
+      <ImageGalleryItem key={id} id={id} webformatURL={webformatURL} />
+    ))}
   </ul>
 );
 
