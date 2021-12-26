@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './index.css';
-// import Loader from 'react-loader-spinner';
 import Searchbar from './components/Searchbar';
 import ImageGallery from './components/ImageGallery';
 import Button from './components/Button';
+import LoaderSimbol from './components/Loader';
+import Modal from './components/Modal';
 
 axios.defaults.baseURL = 'https://pixabay.com/api';
 const KEY = '24201171-f795c334c12b489d5c6645c6d';
 const URI = `/?key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`;
-
-// /?key=your_key&image_type=photo&orientation=horizontal&per_page=12&q=cat&page=1
 
 class App extends Component {
   state = {
@@ -26,12 +25,16 @@ class App extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { search, page } = this.state;
-    if (prevState.search === search) {
-      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
-      this.setState({ images: response.data.hits });
+    if (prevState.search !== search) {
+      const response = await axios.get(`${URI}&q=${search}&page=1&page=1`);
+      this.setState({ images: response.data.hits, page: 1 });
+      return;
     }
-    const response = await axios.get(`${URI}&q=${search}&page=1`);
-    this.setState({ images: response.data.hits, page: 1 });
+    if (prevState.page !== page) {
+      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
+      const newArray = response.data.hits;
+      this.setState(({ images }) => ({ images: [...images, ...newArray] }));
+    }
   }
 
   onLoadMoreButton = () => {
@@ -43,13 +46,16 @@ class App extends Component {
   };
 
   render() {
-    const { images } = this.state;
+    const { images, loaderVisible } = this.state;
     return (
       <div className="App">
+        <Modal images={images} />
         <Searchbar onSubmit={this.onSubmitHandler} />
+        <LoaderSimbol visible={loaderVisible} />
         <ImageGallery images={images} />
-        <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
-        {/* <Loader type="Puff" color="#00BFFF" height={100} width={100} timeout={3000} /> */}
+        {images.length > 1 && (
+          <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
+        )}
       </div>
     );
   }
