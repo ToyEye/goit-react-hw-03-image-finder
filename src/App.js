@@ -16,6 +16,8 @@ class App extends Component {
     images: [],
     page: 1,
     search: '',
+    showModal: false,
+    largeImageURL: '',
   };
 
   async componentDidMount() {
@@ -45,14 +47,31 @@ class App extends Component {
     this.setState({ search: value });
   };
 
+  onLargeImgClick = ({ largeImageURL }) => {
+    this.setState({ largeImageURL: largeImageURL });
+  };
+
+  onToggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
   render() {
-    const { images, loaderVisible } = this.state;
+    const { images, showModal } = this.state;
     return (
       <div className="App">
-        <Modal images={images} />
+        {showModal && (
+          <Modal images={images} onCloseModal={this.onToggleModal}>
+            <img src={this.props.children} alt="" />
+          </Modal>
+        )}
         <Searchbar onSubmit={this.onSubmitHandler} />
-        <LoaderSimbol visible={loaderVisible} />
-        <ImageGallery images={images} />
+        <LoaderSimbol />
+        <ImageGallery
+          images={images}
+          onOpenModal={this.onToggleModal}
+          onLargeImgClick={this.onLargeImgClick}
+        />
         {images.length > 1 && (
           <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
         )}
