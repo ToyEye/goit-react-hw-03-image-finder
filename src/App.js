@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 import './index.css';
 import Searchbar from './components/Searchbar';
 import ImageGallery from './components/ImageGallery';
@@ -12,6 +13,10 @@ const KEY = '24201171-f795c334c12b489d5c6645c6d';
 const URI = `/?key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`;
 
 class App extends Component {
+  static propTypes = {
+    largeImageURL: PropTypes.string,
+    search: PropTypes.string,
+  };
   state = {
     images: [],
     page: 1,
@@ -25,7 +30,7 @@ class App extends Component {
     this.setState({ images: response.data.hits });
   }
 
-  async componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(_, prevState) {
     const { search, page } = this.state;
     if (prevState.search !== search) {
       const response = await axios.get(`${URI}&q=${search}&page=1&page=1`);
@@ -51,27 +56,31 @@ class App extends Component {
     this.setState({ largeImageURL: largeImageURL });
   };
 
-  onToggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
+  onToggleModal = img => {
+    this.setState(prevState => ({
+      showModal: !prevState.showModal,
+      largeImageURL: img,
     }));
   };
   render() {
-    const { images, showModal } = this.state;
+    const { images, showModal, largeImageURL } = this.state;
     return (
       <div className="App">
         {showModal && (
-          <Modal images={images} onCloseModal={this.onToggleModal}>
-            <img src={this.props.children} alt="" />
+          <Modal onCloseModal={this.onToggleModal}>
+            <img src={largeImageURL} alt="" />
           </Modal>
         )}
         <Searchbar onSubmit={this.onSubmitHandler} />
-        <LoaderSimbol />
-        <ImageGallery
-          images={images}
-          onOpenModal={this.onToggleModal}
-          onLargeImgClick={this.onLargeImgClick}
-        />
+        {images.length < 1 ? (
+          <LoaderSimbol />
+        ) : (
+          <ImageGallery
+            images={images}
+            onOpenModal={this.onToggleModal}
+            onLargeImgClick={this.onLargeImgClick}
+          />
+        )}
         {images.length > 1 && (
           <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
         )}

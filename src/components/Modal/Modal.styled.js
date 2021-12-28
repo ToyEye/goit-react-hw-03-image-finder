@@ -36,4 +36,3 @@ class Modal extends Component {
 }
 
 export default Modal;
-/* <img src={this.props.children} alt="" /> */
