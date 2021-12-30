@@ -54,6 +54,12 @@ class App extends Component {
       const response = await axios.get(`${URI}&q=${search}&page=${page}`);
       const newArray = response.data.hits;
       this.setState(({ images }) => ({ images: [...images, ...newArray] }));
+      setTimeout(() => {
+        ImageGallery.scrollIntoView({
+          behavior: 'smooth',
+          block: 'end',
+        });
+      }, 1000);
     }
   }
 
