@@ -21,9 +21,15 @@ class Searchbar extends Component {
     const { value } = this.state;
     evt.preventDefault();
     if (value === '') {
-      toast.error('Нужно ввести запрос', {
+      toast.error('Необходимо ввести запрос', {
         duration: 2000,
-        style: { background: 'black', color: 'white' },
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+          padding: '10px',
+          textAlign: 'center',
+        },
       });
       return;
     }
