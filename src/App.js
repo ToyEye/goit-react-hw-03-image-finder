@@ -7,6 +7,7 @@ import ImageGallery from './components/ImageGallery';
 import Button from './components/Button';
 import LoaderSimbol from './components/Loader';
 import Modal from './components/Modal';
+import { Toaster } from 'react-hot-toast';
 
 axios.defaults.baseURL = 'https://pixabay.com/api';
 const KEY = '24201171-f795c334c12b489d5c6645c6d';
@@ -66,6 +67,8 @@ class App extends Component {
     const { images, showModal, largeImageURL } = this.state;
     return (
       <div className="App">
+        <Toaster />
+
         {showModal && (
           <Modal onCloseModal={this.onToggleModal}>
             <img src={largeImageURL} alt="" />
@@ -73,7 +76,10 @@ class App extends Component {
         )}
         <Searchbar onSubmit={this.onSubmitHandler} />
         {images.length < 1 ? (
-          <LoaderSimbol />
+          <>
+            <LoaderSimbol />
+            <div>ку</div>
+          </>
         ) : (
           <ImageGallery
             images={images}

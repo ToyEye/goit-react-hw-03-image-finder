@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import s from './Searchbar.module.css';
+import PropTypes from 'prop-types';
+import toast from 'react-hot-toast';
 import { ImSearch } from 'react-icons/im';
 
 class Searchbar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  };
   state = {
     value: '',
   };
@@ -13,7 +18,15 @@ class Searchbar extends Component {
   };
 
   handleSubmit = evt => {
+    const { value } = this.state;
     evt.preventDefault();
+    if (value === '') {
+      toast.error('Нужно ввести запрос', {
+        duration: 2000,
+        style: { background: 'black', color: 'white' },
+      });
+      return;
+    }
     this.props.onSubmit(this.state);
     this.setState({ value: '' });
   };
