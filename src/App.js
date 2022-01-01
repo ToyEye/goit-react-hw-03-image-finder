@@ -28,13 +28,15 @@ class App extends Component {
 
   async componentDidMount() {
     const response = await axios.get(`${URI}`);
-    this.setState({ images: response.data.hits });
+    this.setState({ images: response.data.hits, page: 2 });
   }
 
   async componentDidUpdate(_, prevState) {
-    const { search, page } = this.state;
+    const { search } = this.state;
+
     if (prevState.search !== search) {
-      const response = await axios.get(`${URI}&q=${search}&page=1&page=1`);
+      this.setState({ images: [], page: 1 });
+      const response = await axios.get(`${URI}&q=${search}&page=1`);
       if (response.data.hits.length < 1) {
         toast.error('По вашему запросу ничего не найдно, введите другой запрос', {
           duration: 2000,
@@ -46,19 +48,29 @@ class App extends Component {
             textAlign: 'center',
           },
         });
+        return;
       }
-      this.setState({ images: response.data.hits, page: 1 });
+      this.setState(prevState => {
+        return {
+          images: response.data.hits,
+          page: prevState.page + 1,
+        };
+      });
       return;
-    }
-    if (prevState.page !== page) {
-      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
-      const newArray = response.data.hits;
-      this.setState(({ images }) => ({ images: [...images, ...newArray] }));
     }
   }
 
-  onLoadMoreButton = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  onLoadMoreButton = async () => {
+    const { page, search } = this.state;
+    const response = await axios.get(`${URI}&q=${search}&page=${page}`);
+    const newArray = response.data.hits;
+    this.setState(prevState => {
+      return {
+        images: [...prevState.images, ...newArray],
+        page: prevState.page + 1,
+      };
+    });
+
     this.handleScroll();
   };
 
