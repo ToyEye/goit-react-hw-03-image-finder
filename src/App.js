@@ -18,25 +18,24 @@ class App extends Component {
     largeImageURL: PropTypes.string,
     search: PropTypes.string,
   };
+
   state = {
     images: [],
     page: 1,
     search: '',
+    showLoader: false,
     showModal: false,
     largeImageURL: '',
+    total: 0,
   };
 
-  async componentDidMount() {
-    const response = await axios.get(`${URI}`);
-    this.setState({ images: response.data.hits, page: 2 });
-  }
-
   async componentDidUpdate(_, prevState) {
-    const { search } = this.state;
+    const { search, page } = this.state;
 
     if (prevState.search !== search) {
-      this.setState({ images: [], page: 1 });
-      const response = await axios.get(`${URI}&q=${search}&page=1`);
+      this.setState({ showLoader: true });
+      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
+
       if (response.data.hits.length < 1) {
         toast.error('По вашему запросу ничего не найдно, введите другой запрос', {
           duration: 2000,
@@ -48,25 +47,39 @@ class App extends Component {
             textAlign: 'center',
           },
         });
+
+        this.setState({ showLoader: false });
+
         return;
       }
+
+      this.setState({
+        showLoader: false,
+        images: [...response.data.hits],
+        total: response.data.total,
+      });
+
+      return;
+    } else if (prevState.page !== page) {
+      console.log(search);
+      this.setState({ showLoader: true });
+      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
+
       this.setState(prevState => {
         return {
-          images: response.data.hits,
-          page: prevState.page + 1,
+          showLoader: false,
+          images: [...prevState.images, ...response.data.hits],
+          total: response.data.total,
         };
       });
+
       return;
     }
   }
 
   onLoadMoreButton = async () => {
-    const { page, search } = this.state;
-    const response = await axios.get(`${URI}&q=${search}&page=${page}`);
-    const newArray = response.data.hits;
     this.setState(prevState => {
       return {
-        images: [...prevState.images, ...newArray],
         page: prevState.page + 1,
       };
     });
@@ -97,7 +110,7 @@ class App extends Component {
     }));
   };
   render() {
-    const { images, showModal, largeImageURL } = this.state;
+    const { images, showModal, largeImageURL, showLoader, total } = this.state;
     return (
       <div className="App">
         <Toaster />
@@ -108,7 +121,7 @@ class App extends Component {
           </Modal>
         )}
         <Searchbar onSubmit={this.onSubmitHandler} />
-        {images.length < 1 ? (
+        {showLoader ? (
           <LoaderSimbol />
         ) : (
           <ImageGallery
@@ -117,7 +130,7 @@ class App extends Component {
             onLargeImgClick={this.onLargeImgClick}
           />
         )}
-        {images.length > 1 && (
+        {!showLoader && images.length !== total && (
           <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
         )}
       </div>
