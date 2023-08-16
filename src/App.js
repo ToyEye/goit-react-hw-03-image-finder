@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+
 import PropTypes from 'prop-types';
 import './index.css';
 import Searchbar from './components/Searchbar';
@@ -9,9 +9,7 @@ import LoaderSimbol from './components/Loader';
 import Modal from './components/Modal';
 import toast, { Toaster } from 'react-hot-toast';
 
-axios.defaults.baseURL = 'https://pixabay.com/api';
-const KEY = '24201171-f795c334c12b489d5c6645c6d';
-const URI = `/?key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`;
+import { getImages } from './service/service';
 
 class App extends Component {
   static propTypes = {
@@ -29,15 +27,23 @@ class App extends Component {
     total: 0,
   };
 
-  async componentDidUpdate(_, prevState) {
+  componentDidUpdate(_, prevState) {
     const { search, page } = this.state;
 
-    if (prevState.search !== search) {
-      this.setState({ showLoader: true });
-      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
+    if (prevState.search !== search || prevState.page !== page) {
+      this.findImages();
+    }
+  }
 
-      if (response.data.hits.length < 1) {
-        toast.error('По вашему запросу ничего не найдно, введите другой запрос', {
+  findImages = async () => {
+    const { search, page } = this.state;
+
+    this.setState({ showLoader: true });
+    try {
+      const data = await getImages(search, page);
+
+      if (data.hits.length < 1) {
+        toast.error('No results were found for your search, please enter another search', {
           duration: 2000,
           style: {
             borderRadius: '10px',
@@ -53,29 +59,30 @@ class App extends Component {
         return;
       }
 
+      this.setState(prevState => ({
+        images: [...prevState.images, ...data.hits],
+        total: data.total,
+      }));
+    } catch (error) {
+      console.error(error.message);
+      toast.error(error.message, {
+        duration: 2000,
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+          padding: '10px',
+          textAlign: 'center',
+        },
+      });
+    } finally {
       this.setState({
         showLoader: false,
-        images: [...response.data.hits],
-        total: response.data.total,
       });
-
-      return;
-    } else if (prevState.page !== page) {
-      console.log(search);
-      this.setState({ showLoader: true });
-      const response = await axios.get(`${URI}&q=${search}&page=${page}`);
-
-      this.setState(prevState => {
-        return {
-          showLoader: false,
-          images: [...prevState.images, ...response.data.hits],
-          total: response.data.total,
-        };
-      });
-
-      return;
     }
-  }
+
+    return;
+  };
 
   onLoadMoreButton = async () => {
     this.setState(prevState => {
@@ -95,8 +102,9 @@ class App extends Component {
       });
     }, 500);
   };
+
   onSubmitHandler = ({ value }) => {
-    this.setState({ search: value });
+    this.setState({ search: value, page: 1, images: [] });
   };
 
   onLargeImgClick = ({ largeImageURL }) => {
@@ -109,29 +117,27 @@ class App extends Component {
       largeImageURL: img,
     }));
   };
+
   render() {
     const { images, showModal, largeImageURL, showLoader, total } = this.state;
     return (
       <div className="App">
         <Toaster />
-
         {showModal && (
           <Modal onCloseModal={this.onToggleModal}>
             <img src={largeImageURL} alt="" />
           </Modal>
         )}
         <Searchbar onSubmit={this.onSubmitHandler} />
-        {showLoader ? (
-          <LoaderSimbol />
-        ) : (
-          <ImageGallery
-            images={images}
-            onOpenModal={this.onToggleModal}
-            onLargeImgClick={this.onLargeImgClick}
-          />
-        )}
+        {showLoader && <LoaderSimbol />}
+        <ImageGallery
+          images={images}
+          onOpenModal={this.onToggleModal}
+          onLargeImgClick={this.onLargeImgClick}
+        />
+        ,
         {!showLoader && images.length !== total && (
-          <Button name={'Load more'} onLoadMoreButton={this.onLoadMoreButton} />
+          <Button name="Load more" onLoadMoreButton={this.onLoadMoreButton} />
         )}
       </div>
     );
