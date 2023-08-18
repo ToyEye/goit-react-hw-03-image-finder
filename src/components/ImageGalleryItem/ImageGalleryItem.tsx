@@ -1,5 +1,4 @@
-import React from 'react';
-import s from './ImageGalleryItem.module.css';
+import { ImageGalleryItemStyled, GalleryImage } from './ImageGalleryItem.styled';
 
 type TProps = {
   id: string;
@@ -9,14 +8,9 @@ type TProps = {
 };
 
 const ImageGalleryItem = ({ id, webformatURL, onOpenModal, largeImageURL }: TProps) => (
-  <li key={id} id={id} className={s.ImageGalleryItem}>
-    <img
-      className={s.ImageGalleryItem_image}
-      src={webformatURL}
-      alt=""
-      onClick={() => onOpenModal(largeImageURL)}
-    />
-  </li>
+  <ImageGalleryItemStyled key={id} id={id}>
+    <GalleryImage src={webformatURL} alt="" onClick={() => onOpenModal(largeImageURL)} />
+  </ImageGalleryItemStyled>
 );
 
 export default ImageGalleryItem;

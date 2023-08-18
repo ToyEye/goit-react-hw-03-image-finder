@@ -1,4 +1,4 @@
-import s from './Button.module.css';
+import { ButtonStyled } from './Button.styled';
 
 type TProps = {
   name: string;
@@ -6,9 +6,9 @@ type TProps = {
 };
 
 const Button = ({ name, onLoadMoreButton }: TProps) => (
-  <button type="button" className={s.Button} onClick={() => onLoadMoreButton()}>
+  <ButtonStyled type="button" onClick={() => onLoadMoreButton()}>
     {name}
-  </button>
+  </ButtonStyled>
 );
 
 export default Button;
