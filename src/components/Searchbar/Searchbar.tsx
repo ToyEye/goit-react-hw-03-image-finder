@@ -1,25 +1,25 @@
-import React, { Component } from 'react';
+import React, { Component, FormEvent, ChangeEvent } from 'react';
 
-import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { ImSearch } from 'react-icons/im';
 
 import { HeaderStyled, SearchForm, FormButton, FormInput, ButtonLabel } from './Searchbar.styled';
 
-class Searchbar extends Component {
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-  };
+type Props = {
+  onSubmit: (arg: object) => void;
+};
+
+class Searchbar extends Component<Props> {
   state = {
     value: '',
   };
 
-  hadldeChange = evt => {
+  hadldeChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const searchValue = evt.target.value;
     this.setState({ value: searchValue });
   };
 
-  handleSubmit = evt => {
+  handleSubmit = (evt: FormEvent) => {
     const { value } = this.state;
     evt.preventDefault();
     if (value === '') {
