@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import s from './Searchbar.module.css';
+
 import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import { ImSearch } from 'react-icons/im';
+
+import { HeaderStyled, SearchForm, FormButton, FormInput, ButtonLabel } from './Searchbar.styled';
 
 class Searchbar extends Component {
   static propTypes = {
@@ -21,7 +23,7 @@ class Searchbar extends Component {
     const { value } = this.state;
     evt.preventDefault();
     if (value === '') {
-      toast.error('Необходимо ввести запрос', {
+      toast.error('Request must be entered', {
         duration: 2000,
         style: {
           borderRadius: '10px',
@@ -39,15 +41,14 @@ class Searchbar extends Component {
 
   render() {
     return (
-      <header className={s.Searchbar}>
-        <form className={s.SearchForm} onSubmit={this.handleSubmit}>
-          <button type="submit" className={s.SearchForm__button}>
+      <HeaderStyled>
+        <SearchForm onSubmit={this.handleSubmit}>
+          <FormButton type="submit">
             <ImSearch />
-            <span className={s.SearchForm__button__label}>Search</span>
-          </button>
+            <ButtonLabel>Search</ButtonLabel>
+          </FormButton>
 
-          <input
-            className={s.SearchForm__input}
+          <FormInput
             type="text"
             autoComplete="off"
             autoFocus
@@ -55,8 +56,8 @@ class Searchbar extends Component {
             onChange={this.hadldeChange}
             value={this.state.value}
           />
-        </form>
-      </header>
+        </SearchForm>
+      </HeaderStyled>
     );
   }
 }
