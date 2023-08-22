@@ -7,7 +7,6 @@ const modalRoot = document.querySelector('#modal-root');
 type Props = {
   children: React.ReactNode;
   onCloseModal: () => void;
-  this: Modal;
 };
 
 class Modal extends Component<Props> {

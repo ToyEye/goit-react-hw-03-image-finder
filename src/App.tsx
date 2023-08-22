@@ -11,6 +11,15 @@ import toast, { Toaster } from 'react-hot-toast';
 
 import { getImages } from './service/service';
 
+type Props = {
+  images: string[];
+  page: number;
+  search: string;
+  showLoader: boolean;
+  showModal: boolean;
+  largeImageURL: string;
+};
+
 class App extends Component {
   static propTypes = {
     largeImageURL: PropTypes.string,
@@ -27,7 +36,7 @@ class App extends Component {
     total: 0,
   };
 
-  componentDidUpdate(_, prevState) {
+  componentDidUpdate(prevProps: Props, prevState: Props) {
     const { search, page } = this.state;
 
     if (prevState.search !== search || prevState.page !== page) {
@@ -59,11 +68,11 @@ class App extends Component {
         return;
       }
 
-      this.setState(prevState => ({
+      this.setState((prevState: Props) => ({
         images: [...prevState.images, ...data.hits],
-        total: data.total,
+        showBtn: page < Math.ceil(data.totalHits / 12),
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error(error.message);
       toast.error(error.message, {
         duration: 2000,
@@ -85,7 +94,7 @@ class App extends Component {
   };
 
   onLoadMoreButton = async () => {
-    this.setState(prevState => {
+    this.setState((prevState: Props) => {
       return {
         page: prevState.page + 1,
       };
@@ -103,18 +112,18 @@ class App extends Component {
     }, 500);
   };
 
-  onSubmitHandler = ({ value }) => {
+  onSubmitHandler = (value: string) => {
     this.setState({ search: value, page: 1, images: [] });
   };
 
-  onLargeImgClick = ({ largeImageURL }) => {
+  onLargeImgClick = (largeImageURL: string) => {
     this.setState({ largeImageURL: largeImageURL });
+    this.onToggleModal();
   };
 
-  onToggleModal = img => {
-    this.setState(prevState => ({
+  onToggleModal = () => {
+    this.setState((prevState: Props) => ({
       showModal: !prevState.showModal,
-      largeImageURL: img,
     }));
   };
 
@@ -130,12 +139,7 @@ class App extends Component {
         )}
         <Searchbar onSubmit={this.onSubmitHandler} />
         {showLoader && <LoaderSimbol />}
-        <ImageGallery
-          images={images}
-          onOpenModal={this.onToggleModal}
-          onLargeImgClick={this.onLargeImgClick}
-        />
-        ,
+        <ImageGallery images={images} onLargeImgClick={this.onLargeImgClick} />,
         {!showLoader && images.length !== total && (
           <Button name="Load more" onLoadMoreButton={this.onLoadMoreButton} />
         )}

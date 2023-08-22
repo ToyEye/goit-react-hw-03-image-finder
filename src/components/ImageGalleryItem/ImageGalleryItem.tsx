@@ -4,12 +4,12 @@ type TProps = {
   id: string;
   webformatURL: string;
   largeImageURL: string;
-  onOpenModal: (arg: string) => void;
+  onLargeImgClick: (arg: string) => void;
 };
 
-const ImageGalleryItem = ({ id, webformatURL, onOpenModal, largeImageURL }: TProps) => (
+const ImageGalleryItem = ({ id, webformatURL, onLargeImgClick, largeImageURL }: TProps) => (
   <ImageGalleryItemStyled key={id} id={id}>
-    <GalleryImage src={webformatURL} alt="" onClick={() => onOpenModal(largeImageURL)} />
+    <GalleryImage src={webformatURL} alt="" onClick={() => onLargeImgClick(largeImageURL)} />
   </ImageGalleryItemStyled>
 );
 

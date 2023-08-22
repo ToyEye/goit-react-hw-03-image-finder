@@ -6,7 +6,8 @@ import { ImSearch } from 'react-icons/im';
 import { HeaderStyled, SearchForm, FormButton, FormInput, ButtonLabel } from './Searchbar.styled';
 
 type Props = {
-  onSubmit: (arg: object) => void;
+  onSubmit: (arg: string) => void;
+  // value: string;
 };
 
 class Searchbar extends Component<Props> {
@@ -35,7 +36,7 @@ class Searchbar extends Component<Props> {
       });
       return;
     }
-    this.props.onSubmit(this.state);
+    this.props.onSubmit(value);
     this.setState({ value: '' });
   };
 
